@@ -3,13 +3,15 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { CreateAlbumDto } from 'src/album/dto/create-album.dto';
+import { UpdateAlbumDto } from 'src/album/dto/update-album.dto';
 import { CreateArtistDto } from 'src/artist/dto/create-artist.dto';
 import { UpdateArtistDto } from 'src/artist/dto/update-artist.dto';
 import { CreateTrackDto } from 'src/track/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/track/dto/update-track.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
-import { Artist, Track } from 'src/utils/types';
+import { Album, Artist, Track } from 'src/utils/types';
 import { User } from 'src/utils/user';
 import { v4 as UUID } from 'uuid';
 
@@ -18,11 +20,13 @@ export class DatabaseService {
   users: User[];
   tracks: Track[];
   artists: Artist[];
+  albums: Album[];
 
   constructor() {
     this.users = [];
     this.tracks = [];
     this.artists = [];
+    this.albums = [];
   }
 
   getUsers() {
@@ -166,5 +170,51 @@ export class DatabaseService {
     tracks.forEach((track) => (track.artistId = null));
 
     this.artists.splice(index, 1);
+  }
+
+  getAlbums() {
+    return this.albums;
+  }
+
+  getAlbum(id: string) {
+    const album = this.albums.find((el) => el.id === id);
+
+    if (!album) throw new NotFoundException('Album is not found');
+
+    return album;
+  }
+
+  createAlbum(data: CreateAlbumDto) {
+    const newAlbum = {
+      id: UUID(),
+      ...data,
+    };
+
+    this.albums.push(newAlbum);
+
+    return newAlbum;
+  }
+
+  updateAlbum(id: string, data: UpdateAlbumDto) {
+    const album = this.albums.find((el) => el.id === id);
+
+    if (!album) throw new NotFoundException('Album is not found');
+
+    album.name = data.name ? data.name : album.name;
+    album.year = data.year ? data.year : album.year;
+    album.artistId = data.artistId ? data.artistId : album.artistId;
+
+    return album;
+  }
+
+  removeAlbum(id: string) {
+    const index = this.albums.findIndex((album) => album.id === id);
+
+    if (index === -1) throw new NotFoundException('album is not found');
+
+    const tracks = this.tracks.filter((el) => el.albumId === id);
+    tracks.forEach((track) => (track.albumId = null));
+
+    this.albums.splice(index, 1);
   }
 }
