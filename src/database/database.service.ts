@@ -3,11 +3,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { CreateArtistDto } from 'src/artist/dto/create-artist.dto';
+import { UpdateArtistDto } from 'src/artist/dto/update-artist.dto';
 import { CreateTrackDto } from 'src/track/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/track/dto/update-track.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
-import { Track } from 'src/utils/types';
+import { Artist, Track } from 'src/utils/types';
 import { User } from 'src/utils/user';
 import { v4 as UUID } from 'uuid';
 
@@ -15,10 +17,12 @@ import { v4 as UUID } from 'uuid';
 export class DatabaseService {
   users: User[];
   tracks: Track[];
+  artists: Artist[];
 
   constructor() {
     this.users = [];
     this.tracks = [];
+    this.artists = [];
   }
 
   getUsers() {
@@ -117,5 +121,47 @@ export class DatabaseService {
     if (index === -1) throw new NotFoundException('Track is not found');
 
     this.tracks.splice(index, 1);
+  }
+
+  getArtists() {
+    return this.artists;
+  }
+
+  getArtist(id: string) {
+    const artist = this.artists.find((el) => el.id === id);
+
+    if (!artist) throw new NotFoundException('Artist is not found');
+
+    return artist;
+  }
+
+  createArtist(data: CreateArtistDto) {
+    const newArtist = {
+      id: UUID(),
+      ...data,
+    };
+
+    this.artists.push(newArtist);
+
+    return this.artists;
+  }
+
+  updateArtist(id: string, data: UpdateArtistDto) {
+    const artist = this.artists.find((el) => el.id === id);
+
+    if (!artist) throw new NotFoundException('Artist is not found');
+
+    artist.name = data.name ? data.name : artist.name;
+    artist.grammy = data.grammy ? data.grammy : artist.grammy;
+
+    return artist;
+  }
+
+  removeArtist(id: string) {
+    const index = this.artists.findIndex((artist) => artist.id === id);
+
+    if (index === -1) throw new NotFoundException('Artist is not found');
+
+    this.artists.splice(index, 1);
   }
 }
