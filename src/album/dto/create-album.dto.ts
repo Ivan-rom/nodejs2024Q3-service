@@ -1,5 +1,4 @@
-import { Optional } from '@nestjs/common';
-import { IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateAlbumDto {
   @IsString()
@@ -9,6 +8,6 @@ export class CreateAlbumDto {
   year: number;
 
   @IsUUID()
-  @Optional()
+  @IsOptional()
   artistId: string | null;
 }
