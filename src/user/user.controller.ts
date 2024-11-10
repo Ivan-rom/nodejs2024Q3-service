@@ -12,6 +12,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DatabaseService } from 'src/database/database.service';
+import { IDParam } from 'src/utils/IDParam.dto';
 
 @Controller('user')
 export class UserController {
@@ -22,8 +23,9 @@ export class UserController {
     return this.database.getUsers();
   }
 
+  @UsePipes(new ValidationPipe())
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param() { id }: IDParam) {
     return this.database.getUser(id);
   }
 
@@ -35,12 +37,12 @@ export class UserController {
 
   @UsePipes(new ValidationPipe())
   @Put(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
+  update(@Param() { id }: IDParam, @Body() dto: UpdateUserDto) {
     this.database.updateUser(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param() { id }: IDParam) {
     this.database.removeUser(id);
   }
 }
