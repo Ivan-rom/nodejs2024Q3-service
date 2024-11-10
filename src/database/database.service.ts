@@ -168,7 +168,7 @@ export class DatabaseService {
 
     this.artists.push(newArtist);
 
-    return this.artists;
+    return newArtist;
   }
 
   updateArtist(id: string, data: UpdateArtistDto) {
@@ -176,8 +176,8 @@ export class DatabaseService {
 
     if (!artist) throw new NotFoundException('Artist is not found');
 
-    artist.name = data.name ? data.name : artist.name;
-    artist.grammy = data.grammy ? data.grammy : artist.grammy;
+    artist.name = data.name ?? artist.name;
+    artist.grammy = data.grammy ?? artist.grammy;
 
     return artist;
   }
@@ -187,8 +187,13 @@ export class DatabaseService {
 
     if (index === -1) throw new NotFoundException('Artist is not found');
 
-    const tracks = this.tracks.filter((el) => el.artistId === id);
-    tracks.forEach((track) => (track.artistId = null));
+    this.tracks
+      .filter((el) => el.artistId === id)
+      .forEach((track) => (track.artistId = null));
+
+    this.albums
+      .filter((el) => el.artistId === id)
+      .forEach((track) => (track.artistId = null));
 
     const favIndex = this.favorites.artists.findIndex((el) => el === id);
     if (favIndex !== -1) {
