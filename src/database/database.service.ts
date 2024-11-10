@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { User } from 'src/utils/user';
@@ -22,9 +26,11 @@ export class DatabaseService {
   }
 
   getUser(id: string) {
-    const { login, version, createdAt, updatedAt } = this.users.find(
-      (el) => el.id === id,
-    );
+    const user = this.users.find((el) => el.id === id);
+
+    if (!user) throw new NotFoundException('User is not found');
+
+    const { login, version, createdAt, updatedAt } = user;
     return { id, login, version, createdAt, updatedAt };
   }
 
@@ -42,16 +48,21 @@ export class DatabaseService {
 
   updateUser(id: string, data: UpdateUserDto) {
     const user = this.users.find((el) => el.id === id);
-    if (user.password === data.oldPassword) {
-      user.password = data.newPassword;
-      user.version++;
-    }
+
+    if (!user) throw new NotFoundException('User is not found');
+
+    if (user.password !== data.oldPassword)
+      throw new ForbiddenException('Password is wrong');
+
+    user.password = data.newPassword;
+    user.version++;
   }
 
   removeUser(id: string) {
     const index = this.users.findIndex((user) => user.id === id);
-    if (index !== -1) {
-      this.users.splice(index, 1);
-    }
+
+    if (index === -1) throw new NotFoundException('User is not found');
+
+    this.users.splice(index, 1);
   }
 }

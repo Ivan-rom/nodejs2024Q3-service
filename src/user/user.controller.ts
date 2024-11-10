@@ -8,6 +8,7 @@ import {
   UsePipes,
   ValidationPipe,
   Put,
+  HttpCode,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -23,25 +24,27 @@ export class UserController {
     return this.database.getUsers();
   }
 
-  @UsePipes(new ValidationPipe())
   @Get(':id')
+  @UsePipes(new ValidationPipe())
   findOne(@Param() { id }: IDParam) {
     return this.database.getUser(id);
   }
 
-  @UsePipes(new ValidationPipe())
   @Post()
+  @HttpCode(201)
+  @UsePipes(new ValidationPipe())
   create(@Body() dto: CreateUserDto) {
     return this.database.createUser(dto);
   }
 
-  @UsePipes(new ValidationPipe())
   @Put(':id')
+  @UsePipes(new ValidationPipe())
   update(@Param() { id }: IDParam, @Body() dto: UpdateUserDto) {
     this.database.updateUser(id, dto);
   }
 
   @Delete(':id')
+  @HttpCode(204)
   remove(@Param() { id }: IDParam) {
     this.database.removeUser(id);
   }
