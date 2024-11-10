@@ -277,9 +277,6 @@ export class DatabaseService {
   addTrackToFavorites(id: string) {
     const track = this.tracks.find((el) => el.id === id);
 
-    console.log(track);
-    console.log(this.tracks);
-
     if (!track) throw new UnprocessableEntityException('Track does not exist');
 
     this.favorites.tracks.push(track.id);

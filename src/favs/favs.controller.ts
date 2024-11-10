@@ -24,8 +24,6 @@ export class FavsController {
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
   addTrack(@Param() { id }: IDParam) {
-    console.log(id);
-
     this.database.addTrackToFavorites(id);
 
     return {
