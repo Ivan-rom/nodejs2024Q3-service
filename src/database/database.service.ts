@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateAlbumDto } from 'src/album/dto/create-album.dto';
 import { UpdateAlbumDto } from 'src/album/dto/update-album.dto';
@@ -11,7 +12,7 @@ import { CreateTrackDto } from 'src/track/dto/create-track.dto';
 import { UpdateTrackDto } from 'src/track/dto/update-track.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
-import { Album, Artist, Track } from 'src/utils/types';
+import { Album, Artist, Favorites, Track } from 'src/utils/types';
 import { User } from 'src/utils/user';
 import { v4 as UUID } from 'uuid';
 
@@ -21,12 +22,18 @@ export class DatabaseService {
   tracks: Track[];
   artists: Artist[];
   albums: Album[];
+  favorites: Favorites;
 
   constructor() {
     this.users = [];
     this.tracks = [];
     this.artists = [];
     this.albums = [];
+    this.favorites = {
+      tracks: [],
+      albums: [],
+      artists: [],
+    };
   }
 
   getUsers() {
@@ -124,6 +131,11 @@ export class DatabaseService {
 
     if (index === -1) throw new NotFoundException('Track is not found');
 
+    const favIndex = this.favorites.tracks.findIndex((el) => el === id);
+    if (favIndex !== -1) {
+      this.favorites.tracks.splice(favIndex, 1);
+    }
+
     this.tracks.splice(index, 1);
   }
 
@@ -168,6 +180,11 @@ export class DatabaseService {
 
     const tracks = this.tracks.filter((el) => el.artistId === id);
     tracks.forEach((track) => (track.artistId = null));
+
+    const favIndex = this.favorites.artists.findIndex((el) => el === id);
+    if (favIndex !== -1) {
+      this.favorites.artists.splice(favIndex, 1);
+    }
 
     this.artists.splice(index, 1);
   }
@@ -215,6 +232,83 @@ export class DatabaseService {
     const tracks = this.tracks.filter((el) => el.albumId === id);
     tracks.forEach((track) => (track.albumId = null));
 
+    const favIndex = this.favorites.albums.findIndex((el) => el === id);
+    if (favIndex !== -1) {
+      this.favorites.albums.splice(favIndex, 1);
+    }
+
     this.albums.splice(index, 1);
+  }
+
+  getFavorites() {
+    const tracks = this.tracks.filter((el) =>
+      this.favorites.tracks.some((fav) => fav === el.id),
+    );
+
+    const albums = this.albums.filter((el) =>
+      this.favorites.albums.some((fav) => fav === el.id),
+    );
+
+    const artists = this.artists.filter((el) =>
+      this.favorites.artists.some((fav) => fav === el.id),
+    );
+
+    return {
+      tracks,
+      albums,
+      artists,
+    };
+  }
+
+  addTrackToFavorites(id: string) {
+    const track = this.tracks.find((el) => el.id === id);
+
+    console.log(track);
+    console.log(this.tracks);
+
+    if (!track) throw new UnprocessableEntityException('Track does not exist');
+
+    this.favorites.tracks.push(track.id);
+  }
+
+  removeTrackFromFavorites(id: string) {
+    const index = this.favorites.tracks.findIndex((track) => track === id);
+
+    if (index === -1) throw new NotFoundException('Track is not in favorites');
+
+    this.favorites.tracks.splice(index, 1);
+  }
+
+  addArtistToFavorites(id: string) {
+    const artist = this.artists.find((el) => el.id === id);
+
+    if (!artist)
+      throw new UnprocessableEntityException('Artist does not exist');
+
+    this.favorites.artists.push(artist.id);
+  }
+
+  removeArtistFromFavorites(id: string) {
+    const index = this.favorites.artists.findIndex((artist) => artist === id);
+
+    if (index === -1) throw new NotFoundException('Artist is not in favorites');
+
+    this.favorites.artists.splice(index, 1);
+  }
+
+  addAlbumToFavorites(id: string) {
+    const album = this.albums.find((el) => el.id === id);
+
+    if (!album) throw new UnprocessableEntityException('Album does not exist');
+
+    this.favorites.albums.push(album.id);
+  }
+
+  removeAlbumFromFavorites(id: string) {
+    const index = this.favorites.albums.findIndex((album) => album === id);
+
+    if (index === -1) throw new NotFoundException('Album is not in favorites');
+
+    this.favorites.albums.splice(index, 1);
   }
 }
