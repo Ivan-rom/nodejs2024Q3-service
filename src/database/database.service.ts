@@ -162,6 +162,9 @@ export class DatabaseService {
 
     if (index === -1) throw new NotFoundException('Artist is not found');
 
+    const tracks = this.tracks.filter((el) => el.artistId === id);
+    tracks.forEach((track) => (track.artistId = null));
+
     this.artists.splice(index, 1);
   }
 }
