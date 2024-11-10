@@ -40,11 +40,12 @@ export class UserController {
   @Put(':id')
   @UsePipes(new ValidationPipe())
   update(@Param() { id }: IDParam, @Body() dto: UpdateUserDto) {
-    this.database.updateUser(id, dto);
+    return this.database.updateUser(id, dto);
   }
 
   @Delete(':id')
   @HttpCode(204)
+  @UsePipes(new ValidationPipe())
   remove(@Param() { id }: IDParam) {
     this.database.removeUser(id);
   }

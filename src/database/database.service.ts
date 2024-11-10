@@ -79,7 +79,16 @@ export class DatabaseService {
       throw new ForbiddenException('Password is wrong');
 
     user.password = data.newPassword;
+    user.updatedAt = Date.now();
     user.version++;
+
+    return {
+      id: user.id,
+      login: user.login,
+      version: user.version,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 
   removeUser(id: string) {

@@ -12,7 +12,7 @@ export class User {
     this.id = UUID();
     this.login = login;
     this.password = password;
-    this.version = 0;
+    this.version = 1;
     this.createdAt = Date.now();
     this.updatedAt = Date.now();
   }
