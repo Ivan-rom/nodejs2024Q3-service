@@ -8,23 +8,23 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database.service';
 import { IDParam } from 'src/utils/IDParam.dto';
+import { FavsService } from './favs.service';
 
 @Controller('favs')
 export class FavsController {
-  constructor(private readonly database: DatabaseService) {}
+  constructor(private readonly favsService: FavsService) {}
 
   @Get()
   findAll() {
-    return this.database.getFavorites();
+    return this.favsService.getFavorites();
   }
 
   @Post('track/:id')
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
   addTrack(@Param() { id }: IDParam) {
-    this.database.addTrackToFavorites(id);
+    this.favsService.addTrackToFavorites(id);
 
     return {
       message: 'Track is added to favorites',
@@ -35,7 +35,7 @@ export class FavsController {
   @UsePipes(new ValidationPipe())
   @HttpCode(204)
   removeTrack(@Param() { id }: IDParam) {
-    this.database.removeTrackFromFavorites(id);
+    this.favsService.removeTrackFromFavorites(id);
 
     return {
       message: 'Track is removed from favorites',
@@ -46,7 +46,7 @@ export class FavsController {
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
   addAlbum(@Param() { id }: IDParam) {
-    this.database.addAlbumToFavorites(id);
+    this.favsService.addAlbumToFavorites(id);
 
     return {
       message: 'Album is added to favorites',
@@ -57,7 +57,7 @@ export class FavsController {
   @UsePipes(new ValidationPipe())
   @HttpCode(204)
   removeAlbum(@Param() { id }: IDParam) {
-    this.database.removeAlbumFromFavorites(id);
+    this.favsService.removeAlbumFromFavorites(id);
 
     return {
       message: 'Album is removed from favorites',
@@ -68,7 +68,7 @@ export class FavsController {
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
   addArtist(@Param() { id }: IDParam) {
-    this.database.addArtistToFavorites(id);
+    this.favsService.addArtistToFavorites(id);
 
     return {
       message: 'Artist is added to favorites',
@@ -79,7 +79,7 @@ export class FavsController {
   @UsePipes(new ValidationPipe())
   @HttpCode(204)
   removeArtist(@Param() { id }: IDParam) {
-    this.database.removeArtistFromFavorites(id);
+    this.favsService.removeArtistFromFavorites(id);
 
     return {
       message: 'Artist is removed from favorites',

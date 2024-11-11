@@ -12,40 +12,41 @@ import {
 } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { DatabaseService } from 'src/database/database.service';
 import { IDParam } from 'src/utils/IDParam.dto';
+import { ArtistService } from './artist.service';
 
 @Controller('artist')
 export class ArtistController {
-  constructor(private readonly database: DatabaseService) {}
+  constructor(private readonly artistService: ArtistService) {}
+
   @Get()
   findAll() {
-    return this.database.getArtists();
+    return this.artistService.getArtists();
   }
 
   @Get(':id')
   @UsePipes(new ValidationPipe())
   findOne(@Param() { id }: IDParam) {
-    return this.database.getArtist(id);
+    return this.artistService.getArtist(id);
   }
 
   @Post()
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
   create(@Body() createArtistDto: CreateArtistDto) {
-    return this.database.createArtist(createArtistDto);
+    return this.artistService.createArtist(createArtistDto);
   }
 
   @Put(':id')
   @UsePipes(new ValidationPipe())
   update(@Param() { id }: IDParam, @Body() updateArtistDto: UpdateArtistDto) {
-    return this.database.updateArtist(id, updateArtistDto);
+    return this.artistService.updateArtist(id, updateArtistDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
   @UsePipes(new ValidationPipe())
   remove(@Param() { id }: IDParam) {
-    return this.database.removeArtist(id);
+    return this.artistService.removeArtist(id);
   }
 }
