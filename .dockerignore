@@ -17,6 +17,9 @@ lerna-debug.log*
 # Tests
 /coverage
 /.nyc_output
+/test
+**/*.spec.ts
+jest.config.json
 
 # IDEs and editors
 /.idea
@@ -39,14 +42,14 @@ lerna-debug.log*
 .gitignore
 
 # Docker
-Dockerfile
+Dockerfile*
 .dockerignore
+docker-compose.yaml
 
 # Code quality
 .eslintrc.js
 .prettierrc
 
-# Tests
-**/*.{spec, test}.{ts, js}
-/test
-jest.config.json
+# Other
+README.md
+nest-cli.json
